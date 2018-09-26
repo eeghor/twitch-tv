@@ -18,6 +18,8 @@ class Twitch:
 
 		self.driver = webdriver.Chrome('webdriver/chromedriver', chrome_options=options)
 
+		self.chat = []
+
 
 	def get(self):
 
@@ -34,14 +36,29 @@ class Twitch:
 			print('cannot click settings!')
 
 		try:
+			total_time = WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#default-player > div > div.hover-display.pl-hover-transition-out > div > div.pl-controls-bottom.pl-flex.qa-controls-bottom > div.player-seek > div.player-seek__time-container > span.player-seek__time.player-seek__time--total'))).text
+			print(f'total time: {total_time}')
+		except:
+			print('can\'t find total time of this video')
+
+		try:
 			comment_list = WebDriverWait(self.driver, 60).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '#root > div > div.tw-flex.tw-flex-column.tw-flex-nowrap.tw-full-height > div > div.right-column.tw-flex-shrink-0.tw-full-height.tw-relative > div > div > div > div.tw-full-height.tw-overflow-hidden.tw-relative > div > div > ul')))
 		except:
 			print('no comment list!')
 
 		while True:
 			for c in self.driver.find_elements_by_css_selector('#root > div > div.tw-flex.tw-flex-column.tw-flex-nowrap.tw-full-height > div > div.right-column.tw-flex-shrink-0.tw-full-height.tw-relative > div > div > div > div.tw-full-height.tw-overflow-hidden.tw-relative > div > div > ul > li'):
-				print(c.text)
+				t = c.text.strip()
+				if t and (t not in self.chat):
+					self.chat.append(t)
+					print(self.chat[-1])
 			time.sleep(5)
+
+			try:
+				time_now = WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#default-player > div > div.hover-display.pl-hover-transition-out > div > div.pl-controls-bottom.pl-flex.qa-controls-bottom > div.player-seek > div.player-slider.js-player-slider'))).get_attribute('aria-valuenow')
+				print(f'time now: {time_now}')
+			except:
+				print('can\'t find total time of this video')
 
 if __name__ == '__main__':
 
